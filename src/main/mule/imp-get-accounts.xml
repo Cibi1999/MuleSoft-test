@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<flow name="imp-get-accountsFlow" doc:id="7bfb3e2b-44d9-47ed-8a13-783b73aa8f04" >
+		<logger level="INFO" doc:name="Logger to verify the request" doc:id="c47f5ee9-8028-424a-9521-646d4d7a4199" />
+		<try doc:name="Try" doc:id="bd72b798-6f47-425e-8430-dda2ac0c2b6b" >
+			<http:request method="${request-config.get-method}" doc:name="Request to get accounts from sfdc sapi" doc:id="3f9f73ed-bee0-4176-9ae0-e83719b36927" config-ref="HTTP_Request_configuration-sfdc-sapi" path="${request-config.get-path}" sendCorrelationId="ALWAYS" target="payload">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"correlationId" : "good",
+	"client_secret" : "aAB82B8180B04E3391b503AA66844654",
+	"client_id" : "278c2c024ce94151884f31b544fb242b"
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"account_id" : vars.account_id
+}]]]></http:uri-params>
+		</http:request>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6519ac3c-1e50-4291-9e90-be30af42a01b" >
+					<raise-error doc:name="Raise error" doc:id="e6ca195b-f69d-4d29-9740-e8a0b38c6d12" type="ANY" description="Check the Connection in Request Component"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<async doc:name="Async" doc:id="8ffe99ec-b7e5-4d8f-9d1a-3c9db7d68e2e" >
+			<email:send doc:name="Send" doc:id="1b284f84-c4b5-4f21-bb78-0923c45efcf1" subject="Account Accessed!" config-ref="Email_SMTP">
+			<email:to-addresses>
+				<email:to-address value="cibi.sivakumar@logicalmindsit.com" />
+			</email:to-addresses>
+			<email:body>
+				<email:content><![CDATA[Your Salesforce Account has been accessed by mulesoft developer, if it is not you please change the account password or security token created in salesforce.]]></email:content>
+			</email:body>
+		</email:send>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="2fa25b9c-f5f5-4df8-8f8f-00e3209e2c3e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Mail-Message": "Notification for the mail user was sent for the security reason",
+	"Actual-Payload": vars.payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="mobile-accounts-eapi-suite.xml" />
+	<munit:test name="mobile-accounts-eapi-console-test" doc:id="da478adb-bc08-4829-886c-488d98d158eb" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2eabfa28-c144-4ef4-b3cf-f5b4fdb209c4" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mobile-accounts-eapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="55381533-acc9-417e-8079-8da8571c5faa" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mobile-accounts-eapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="0c8195ad-abb2-4505-b07b-bcd5977ff3bb" >
+				<munit:payload value="#[readUrl('classpath://mobileaccountseapiconsoletest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://mobileaccountseapiconsoletest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mobile-accounts-eapi-console" doc:id="c2350dd1-35f6-40e4-a21b-904c9ca493fc" name="mobile-accounts-eapi-console"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="2d03ec87-3f12-4124-bf2a-0f820e457c03" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import mobileaccountseapiconsoletest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="put:\accounts\(account_id):application\json:mobile-accounts-eapi-config-test" doc:id="6a0bf50a-dced-4488-821b-8308b5d11406" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="891da743-472b-4fd5-b4e0-568ec9750431" >
+				<munit:payload value="#[output application/json  --- readUrl('classpath://putaccountsaccountidapplicationjsonmobileaccountseapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json " />
+				<munit:attributes value="#[readUrl('classpath://putaccountsaccountidapplicationjsonmobileaccountseapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeadersMapName" value="#[readUrl('classpath://putaccountsaccountidapplicationjsonmobileaccountseapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to put:\accounts\(account_id):application\json:mobile-accounts-eapi-config" doc:id="99cb7c25-55f0-49ff-829c-d73c6ba8b029" name="put:\accounts\(account_id):application\json:mobile-accounts-eapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="5f70da43-1e1f-4a3e-b5ea-01658ec84921" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import putaccountsaccountidapplicationjsonmobileaccountseapiconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

@@ -1,0 +1,34 @@
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  timeout: "30000"
+  path: "/api/*"
+  
+request-config:
+  get-method: "GET"
+  put-method: "PUT"
+  post-method: "POST"
+  delete-method: "DELETE"
+  host-sfdc-sapi: "lm-sfdc-sapi.us-e2.cloudhub.io" 
+  get-path: "/api/accounts/{account_id}"
+  delete-path: "/api/accounts/{account_id}"
+  host-sfdc-papi: "lm-sfdc-papi.us-e2.cloudhub.io"
+  port: "443"
+  post-path: "/api/accounts"
+  put-path: "/api/accounts/{account_id}"
+ 
+  
+
+
+Truststore:
+  path: "Truststore.jks"
+  password: "![lNzQndTAmyquEyXfnL3Aqw==]" 
+  type: JKS
+
+keystore:
+  keyPassword: "![lNzQndTAmyquEyXfnL3Aqw==]"
+  Password: "![lNzQndTAmyquEyXfnL3Aqw==]"
+  path: "keystore.jks"
+  type: JKS
+ 
+
