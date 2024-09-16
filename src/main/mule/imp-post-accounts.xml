@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="imp-post-accountsFlow" doc:id="3026c0b7-126f-4696-b0f8-c44270c1636a" >
+		<logger level="INFO" doc:name="Logger to verify the flow" doc:id="836466a3-f060-4fa1-a6de-e2301dd02089" />
+		<http:request method="${request-config.post-method}" doc:name="Request to create accounts in sfdc " doc:id="884fe6be-2b47-4fc2-b7a1-7bd682a1a16d" config-ref="HTTP_Request_configuration-sfdc-papi" path="${request-config.post-path}" sendCorrelationId="ALWAYS" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"correlationId" : "good",
+	"client_secret" : "aAB82B8180B04E3391b503AA66844654",
+	"client_id" : "278c2c024ce94151884f31b544fb242b"
+}]]]></http:headers>
+		</http:request>
+		<async doc:name="Async" doc:id="3130af42-b202-4bc2-8b6e-e25eb002de6f" >
+			<email:send doc:name="Send" doc:id="7d47be39-9940-4ffe-8d55-c66e8fe60e8d" config-ref="Email_SMTP" subject="Account Accessed!" >
+				<email:to-addresses >
+					<email:to-address value="cibi.sivakumar@logicalmindsit.com" />
+				</email:to-addresses>
+				<email:body >
+					<email:content ><![CDATA[Your Salesforce Account has been accessed by mulesoft developer, if it is not you please change the account password or security token created in salesforce.]]></email:content>
+				</email:body>
+			</email:send>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="3e19a95b-7a31-4def-b90a-0dcfbe7b653d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Mail-Message": "Notification for the mail user was sent for the security reason",
+	"Actual-Payload": vars.payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

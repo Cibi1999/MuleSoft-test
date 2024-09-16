@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="imp-delete-accountsFlow" doc:id="f89321b0-51a4-4a05-8d2d-a37135fc459c" >
+		<logger level="INFO" doc:name="Logger to verify the request" doc:id="e90e13bb-f2c2-4b2f-85ea-d69169bd93d6" />
+		<http:request method="${request-config.delete-method}" doc:name="Request to delete account " doc:id="b21f4cec-6bdc-413c-9674-0955fe45d568" config-ref="HTTP_Request_configuration-sfdc-sapi" path="${request-config.delete-path}" sendCorrelationId="ALWAYS">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"correlationId" : "good",
+	"client_secret" : "aAB82B8180B04E3391b503AA66844654",
+	"client_id" : "278c2c024ce94151884f31b544fb242b"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"account_id" : vars.account_id
+}]]]></http:uri-params>
+		</http:request>
+		<async doc:name="Async" doc:id="c899d2b5-cfcc-4122-b586-60f4e3d62bea" >
+			<email:send doc:name="Send" doc:id="f5579c7e-0697-4a94-9c29-057ddb1ea126" config-ref="Email_SMTP" subject="Account Accessed!" >
+				<email:to-addresses >
+					<email:to-address value="cibi.sivakumar@logicalmindsit.com" />
+				</email:to-addresses>
+				<email:body >
+					<email:content ><![CDATA[Your Salesforce Account has been accessed by mulesoft developer, if it is not you please change the account password or security token created in salesforce.]]></email:content>
+				</email:body>
+			</email:send>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="95721359-b14e-48b4-afb9-a819e4278a70" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Mail-Message": "Notification for the mail user was sent for the security reason",
+	"Actual-Payload": vars.payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
